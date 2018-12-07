@@ -34,7 +34,10 @@ Parameters:
     Type: String
     AllowedPattern: ^([a-zA-Z0-9`~#$%^&*()_+,\\-])*$
     Default: ohdsi-sample-data
-
+  SageMakerBucket:
+    Description: Name of the S3 bucket you want to use to hold the PatientLevelPrediction training data and model output for SageMaker.  If you leave this blank a bucket will be generated for you.
+    Type: 'String'
+    AllowedPattern: ^([a-zA-Z0-9`~#$%^&*()_+,\\-])*$
 
   VPCcidr:
     Description: (optional to change) CIDR IP Range for your REDCap VPC.
@@ -421,6 +424,8 @@ Resources:
                 - ec2.amazonaws.com
             Action:
               - 'sts:AssumeRole'
+      ManagedPolicyArns: 
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
       Policies:
         - PolicyName: root
           PolicyDocument:
@@ -465,12 +470,6 @@ Resources:
                   - 'logs:PutLogEvents'
                 Effect: Allow
                 Resource: '*'
-              - Sid: SSMAccess
-                Action:
-                  - 'ssm:PutParameter'
-                  - 'ssm:GetParameter'
-                Effect: Allow
-                Resource: 'arn:aws:ssm:*:*:parameter/redcap-salt'
               - Sid: EncryptedEBS
                 Action:
                   - 'ec2:CreateVolume'
@@ -605,7 +604,7 @@ Resources:
         - !Ref 'EC2Role'
 
 
-#IAM Roles for the temporary EC2 server to compile Atlas and WebAPI, apply the database DDLs, load the sample data, and run Achilles
+#IAM Roles for the RStudio Server
   RStudioRole:
     Type: AWS::IAM::Role
     Properties:
@@ -618,6 +617,9 @@ Resources:
             Action:
               - sts:AssumeRole
       Path: /
+      ManagedPolicyArns: 
+        - "arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM"
+        - "arn:aws:iam::aws:policy/AmazonSageMakerFullAccess"
   RStudioRolePolicies:
     Type: AWS::IAM::Policy
     Properties:
@@ -629,13 +631,18 @@ Resources:
               - "s3:GetObject"
               - "s3:ListObjects"
               - "s3:ListBucket"
+              - "s3:PutObject"
+              - "s3:CreateBucket"
             Resource:    
               - !Join [ "", [ 'arn:aws:s3:::', !Ref "AWS::AccountId", '-', !Select [ 1, !Split [ '-', !Ref 'subnetd3e13a98'] ], '-atlas' ] ]
               - !Join [ "", [ 'arn:aws:s3:::', !Ref "AWS::AccountId", '-', !Select [ 1, !Split [ '-', !Ref 'subnetd3e13a98'] ], '-atlas', '/*' ] ]
               - !Join [ "", [ 'arn:aws:s3:::', !Ref SourcesBucket ] ]
-              - !Join [ "", [ 'arn:aws:s3:::', !Ref SourcesBucket, '/*' ] ]         
+              - !Join [ "", [ 'arn:aws:s3:::', !Ref SourcesBucket, '/*' ] ]    
+              - !Join [ "", [ 'arn:aws:s3:::', !Ref SageMakerBucket ] ]    
+              - !Join [ "", [ 'arn:aws:s3:::', !Ref SageMakerBucket, '/*' ] ] 
           - Effect: Allow
             Action: 
+              - "iam:GetRole"
               - "s3:ListAllMyBuckets"
             Resource: '*'
       Roles:

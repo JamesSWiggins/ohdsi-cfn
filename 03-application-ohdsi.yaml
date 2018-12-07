@@ -14,25 +14,6 @@ Description: This CloudFormation Template deploys a complete OHDSI environment. 
 
 
 Parameters:
-  MultiAZDatabase:
-    AllowedValues:
-      - true
-      - false
-    Default: false
-    Description: Specifies whether a to deploy the AWS Aurora MySQL Database in Multi-AZ configuration.
-    Type: String
-  DatabaseInstanceType:
-    AllowedValues:
-      - db.r4.large
-      - db.r4.xlarge
-      - db.r4.2xlarge
-      - db.r4.4xlarge
-      - db.r4.8xlarge
-      - db.r4.16xlarge
-    ConstraintDescription: Must be a valid RDS instance class.
-    Default: db.r4.large
-    Description: The Amazon RDS database instance class.
-    Type: String
   WebAsgMax:
     AllowedPattern: ^((?!0$)[1-2]?[0-9]|30)$
     ConstraintDescription: Must be a number between 1 and 30.
@@ -143,22 +124,6 @@ Parameters:
     Type: String
     AllowedPattern: ^([a-zA-Z0-9`~#$%^&*()_+,\\-])*$
     Default: ohdsi-sample-data  
-  RedshiftInstanceType:
-    Type: String
-    Description: DC instance types provide faster, but smaller storage.  DS instance types provide larger, but slower storage.
-    AllowedValues:
-      - dc2.large
-      - dc2.8xlarge
-      - ds2.xlarge
-      - ds2.8xlarge
-      - dc1.large
-    Default: dc2.large
-  NumRedshiftNodes:
-    AllowedPattern: ^((?!0$)[1-2]?[0-9]|32)$
-    ConstraintDescription: Must be a number between 1 and 32.
-    Default: 1
-    Description: Specifies the  number of nodes in your Redshift cluster.
-    Type: String  
   OMOPv:
     Description: The OHDSI CommonDataModel GitHub branch you want deployed (this specifies the version)
     Type: String
@@ -200,15 +165,9 @@ Parameters:
     Type: AWS::EC2::Subnet::Id
   SubnetAppB:
     Type: AWS::EC2::Subnet::Id
-  SubnetDataA:
-    Type: AWS::EC2::Subnet::Id
-  SubnetDataB:
-    Type: AWS::EC2::Subnet::Id
   SGPublic:
     Type: AWS::EC2::SecurityGroup::Id
   SGApp:
-    Type: AWS::EC2::SecurityGroup::Id
-  SGData:
     Type: AWS::EC2::SecurityGroup::Id
   EBServiceRole:
     Type: String
@@ -216,13 +175,17 @@ Parameters:
     Type: String
   TempEC2InstanceProfile:
     Type: String
-  RSRoleArn:
-    Type: String
   RStudioTargetGroupArn:
+    Type: String
+  RDSEndpoint: 
+    Type: String
+  RedshiftEndpoint: 
     Type: String
   EBBucket:
     Type: String
     Description: 'S3 Bucket used to store the application package for Elastic Beanstalk.'
+  RSRoleArn:
+    Type: String
 
 
 #Mapping to find the Amazon Linux AMI in each region.  This AMI is used for the temporary EC2 server.
@@ -263,10 +226,6 @@ Mappings:
 
 
 Conditions:
-  DeployMultiAZDB: 
-    !Equals [ true, !Ref MultiAZDatabase ] 
-  NotDeployMultiAZDB: 
-    !Equals [ false, !Ref MultiAZDatabase ]
   DeployRoute53: 
     !Equals [ true, !Ref UseRoute53Boolean ]
   DeployACM: !And 
@@ -275,10 +234,7 @@ Conditions:
   NotDeployACM: !Or
     - !Equals [ false, !Ref UseACMBoolean ]
     - !Equals [ false, !Ref UseRoute53Boolean ]
-  SingleNodeRedshift:
-    !Equals [ '1', !Ref NumRedshiftNodes ]
-  MultiNodeRedshift:
-    !Not [ !Equals [ '1', !Ref NumRedshiftNodes ] ]
+
 
 Resources:
 
@@ -532,131 +488,9 @@ Resources:
           Value: true 
 
 
-
-
-# Deploys the RDS Aurora Postgres cluster used to store the application data for WebAPI.
-  RDSCluster:
-    Type: AWS::RDS::DBCluster
-    Properties:
-      MasterUsername: 'master'
-      MasterUserPassword: !Ref DatabaseMasterPassword
-      Engine: aurora-postgresql
-      StorageEncrypted: 'True'
-      Port: 5432
-      DBSubnetGroupName:
-        Ref: RDSDBSubnets
-      DBClusterParameterGroupName:
-        Ref: RDSDBClusterParameterGroup
-      VpcSecurityGroupIds:
-        - !Ref SGData
-  RDSDBInstance1:
-    Type: AWS::RDS::DBInstance
-    Properties:
-      DBSubnetGroupName:
-        Ref: RDSDBSubnets
-      DBParameterGroupName:
-        Ref: RDSDBParameterGroup
-      Engine: aurora-postgresql
-      DBClusterIdentifier:
-        Ref: RDSCluster
-      PubliclyAccessible: 'false'
-      DBInstanceClass: !Ref DatabaseInstanceType
-# Only create the second instance if the user specified a Multi-AZ Database  
-  RDSDBInstance2:
-    Condition: DeployMultiAZDB
-    Type: AWS::RDS::DBInstance
-    Properties:
-      DBSubnetGroupName:
-        Ref: RDSDBSubnets
-      DBParameterGroupName:
-        Ref: RDSDBParameterGroup
-      Engine: aurora-postgresql
-      DBClusterIdentifier:
-        Ref: RDSCluster
-      PubliclyAccessible: 'false'
-      DBInstanceClass: !Ref DatabaseInstanceType
-  RDSDBClusterParameterGroup:
-    Type: AWS::RDS::DBClusterParameterGroup
-    Properties:
-      Description: CloudFormation Sample Aurora Cluster Parameter Group
-      Family: aurora-postgresql9.6
-      Parameters:
-        rds.force_ssl: 1
-  RDSDBParameterGroup:
-    Type: AWS::RDS::DBParameterGroup
-    Properties:
-      Description: CloudFormation Sample Aurora Parameter Group
-      Family: aurora-postgresql9.6
-      Parameters:
-        log_rotation_age: 60
-  RDSDBSubnets:
-    Type: AWS::RDS::DBSubnetGroup
-    Properties:
-      DBSubnetGroupDescription: Subnet Group for RDS
-      SubnetIds:
-        - !Ref SubnetDataA
-        - !Ref SubnetDataB
-
-
-  RedshiftClusterSingle: 
-    Condition: SingleNodeRedshift
-    Type: "AWS::Redshift::Cluster"
-    Properties:
-      DBName: "mycdm"
-      MasterUsername: "master"
-      MasterUserPassword: !Ref DatabaseMasterPassword
-      NodeType: !Ref RedshiftInstanceType
-      ClusterType: "single-node"
-      Encrypted: "True"
-      PubliclyAccessible: "False"
-      ClusterParameterGroupName: !Ref RedshiftClusterParameterGroup
-      IamRoles: 
-        - !Ref RSRoleArn
-      VpcSecurityGroupIds: 
-        - !Ref SGData
-      ClusterSubnetGroupName:
-        Ref: RedshiftSubnetGroup
-  RedshiftClusterMulti: 
-    Condition: MultiNodeRedshift
-    Type: "AWS::Redshift::Cluster"
-    Properties:
-      DBName: "mycdm"
-      MasterUsername: "master"
-      MasterUserPassword: !Ref DatabaseMasterPassword
-      NodeType: !Ref RedshiftInstanceType
-      ClusterType: "multi-node"
-      NumberOfNodes: !Ref NumRedshiftNodes
-      Encrypted: "True"
-      PubliclyAccessible: "False"
-      ClusterParameterGroupName: !Ref RedshiftClusterParameterGroup
-      IamRoles: 
-        - !Ref RSRoleArn
-      VpcSecurityGroupIds: 
-        - !Ref SGData
-      ClusterSubnetGroupName:
-        Ref: RedshiftSubnetGroup
-  RedshiftSubnetGroup:
-    Type: 'AWS::Redshift::ClusterSubnetGroup'
-    Properties:
-      Description: "Redshift Security Groups"
-      SubnetIds:
-        - !Ref SubnetDataA
-  RedshiftClusterParameterGroup: 
-    Type: "AWS::Redshift::ClusterParameterGroup"
-    Properties: 
-      Description: "My parameter group"
-      ParameterGroupFamily: "redshift-1.0"
-      Parameters: 
-        - 
-          ParameterName: "require_ssl"
-          ParameterValue: "true"
-
-
 # This is a temporary EC2 server used to add the necessary Elastic Beanstalk scripts to the Project REDCap source code zip file.
   TempEC2Instance:
     Type: AWS::EC2::Instance
-    DependsOn: 
-      - RDSCluster
     Metadata:
       AWS::CloudFormation::Init:
         config:
@@ -973,39 +807,37 @@ Resources:
                 owner: root
                 group: root
               /tmp/settings.xml:
-                content: !Sub 
-                  - |
-                    <settings>
-                    <profiles>
-                      <profile>
-                        <id>webapi-postgresql</id>
-                        <properties>
-                          <datasource.driverClassName>org.postgresql.Driver</datasource.driverClassName>
-                          <datasource.url>jdbc:postgresql://${RDSEndpoint}:5432/OHDSI?ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory</datasource.url>
-                          <datasource.username>ohdsi_app_user</datasource.username>
-                          <datasource.password>app1</datasource.password>
-                          <datasource.dialect>postgresql</datasource.dialect>
-                          <datasource.ohdsi.schema>webapi</datasource.ohdsi.schema>
-                          <flyway.datasource.driverClassName>${!datasource.driverClassName}</flyway.datasource.driverClassName>
-                          <flyway.datasource.url>${!datasource.url}</flyway.datasource.url>
-                          <flyway.datasource.username>ohdsi_admin_user</flyway.datasource.username>
-                          <flyway.datasource.password>admin1</flyway.datasource.password>
-                          <flyway.locations>classpath:db/migration/postgresql</flyway.locations>
-                          <security.enabled>false</security.enabled>
-                          <security.token.expiration>43200</security.token.expiration>
-                          <security.origin>*</security.origin>
-                          <security.ssl.enabled>false</security.ssl.enabled>
-                          <security.oauth.callback.ui>http://localhost/atlas/#/welcome</security.oauth.callback.ui>
-                          <security.oauth.callback.api>http://localhost:8080/WebAPI/user/oauth/callback</security.oauth.callback.api>
-                          <security.oauth.google.apiKey></security.oauth.google.apiKey>
-                          <security.oauth.google.apiSecret></security.oauth.google.apiSecret>
-                          <security.oauth.facebook.apiKey></security.oauth.facebook.apiKey>
-                          <security.oauth.facebook.apiSecret></security.oauth.facebook.apiSecret>
-                        </properties> 
-                      </profile>  
-                    </profiles>
-                    </settings> 
-                  - { RDSEndpoint: !GetAtt RDSCluster.Endpoint.Address }               
+                content: !Sub |
+                  <settings>
+                  <profiles>
+                    <profile>
+                      <id>webapi-postgresql</id>
+                      <properties>
+                        <datasource.driverClassName>org.postgresql.Driver</datasource.driverClassName>
+                        <datasource.url>jdbc:postgresql://${RDSEndpoint}:5432/OHDSI?ssl=true&amp;sslfactory=org.postgresql.ssl.NonValidatingFactory</datasource.url>
+                        <datasource.username>ohdsi_app_user</datasource.username>
+                        <datasource.password>app1</datasource.password>
+                        <datasource.dialect>postgresql</datasource.dialect>
+                        <datasource.ohdsi.schema>webapi</datasource.ohdsi.schema>
+                        <flyway.datasource.driverClassName>${!datasource.driverClassName}</flyway.datasource.driverClassName>
+                        <flyway.datasource.url>${!datasource.url}</flyway.datasource.url>
+                        <flyway.datasource.username>ohdsi_admin_user</flyway.datasource.username>
+                        <flyway.datasource.password>admin1</flyway.datasource.password>
+                        <flyway.locations>classpath:db/migration/postgresql</flyway.locations>
+                        <security.enabled>false</security.enabled>
+                        <security.token.expiration>43200</security.token.expiration>
+                        <security.origin>*</security.origin>
+                        <security.ssl.enabled>false</security.ssl.enabled>
+                        <security.oauth.callback.ui>http://localhost/atlas/#/welcome</security.oauth.callback.ui>
+                        <security.oauth.callback.api>http://localhost:8080/WebAPI/user/oauth/callback</security.oauth.callback.api>
+                        <security.oauth.google.apiKey></security.oauth.google.apiKey>
+                        <security.oauth.google.apiSecret></security.oauth.google.apiSecret>
+                        <security.oauth.facebook.apiKey></security.oauth.facebook.apiKey>
+                        <security.oauth.facebook.apiSecret></security.oauth.facebook.apiSecret>
+                      </properties> 
+                    </profile>  
+                  </profiles>
+                  </settings>              
                 mode: 000664
                 owner: root
                 group: root
@@ -1118,6 +950,11 @@ Resources:
                         else
                         echo "Already have a self-signed private key.  This must be an application redeployment"
                         fi
+                    02InstallSSMClient:
+                      command: |
+                        # Install SSM client
+                        yum install -y https://s3.amazonaws.com/ec2-downloads-windows/SSMAgent/latest/linux_amd64/amazon-ssm-agent.rpm
+                        restart amazon-ssm-agent
                 mode: 000500
                 owner: root
                 group: root
@@ -1168,7 +1005,7 @@ Resources:
             #Shutdown and terminate this temporary instance 
             sleep 20
             shutdown -h now
-          - { LastRDSDBInstance: !If [ DeployMultiAZDB, !GetAtt RDSDBInstance2.Endpoint.Address, !GetAtt RDSDBInstance1.Endpoint.Address ], RDSEndpoint: !GetAtt RDSCluster.Endpoint.Address, RedshiftEndpoint: !If [ MultiNodeRedshift, !GetAtt RedshiftClusterMulti.Endpoint.Address, !GetAtt RedshiftClusterSingle.Endpoint.Address ], RstudioTGArn: !Ref RStudioTargetGroupArn }
+          - { RstudioTGArn: !Ref RStudioTargetGroupArn }
   EC2WaitCondition:
     Type: "AWS::CloudFormation::WaitCondition"
     DependsOn: "TempEC2Instance"

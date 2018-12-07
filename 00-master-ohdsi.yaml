@@ -401,7 +401,10 @@ Parameters:
     Description: Provide a comma separated list of usernames and passwords (user1,pass1,user2,pass2) to create on the RStudio Server.  The first user in the list will be given sudoers access.
     Type: 'String'
     NoEcho: true
-
+  SageMakerBucket:
+    Description: Name of the S3 bucket you want to use to hold the PatientLevelPrediction training data and model output for SageMaker.  If you leave this blank a bucket will be generated for you.
+    Type: 'String'
+    AllowedPattern: ^([a-zA-Z0-9`~#$%^&*()_+,\\-])*$
   OMOPv:
     Description: The OHDSI CommonDataModel GitHub branch you want deployed (this specifies the version)
     Type: String
@@ -409,11 +412,11 @@ Parameters:
   Atlasv:
     Description: The OHDSI Atlas GitHub branch you want deployed (this specifies the version)
     Type: String
-    Default: 'v2.5.0'
+    Default: 'v2.6.0'
   WebAPIv:
     Description: OHDSI WebAPI GitHub branch you want deployed (this specifies the version)
     Type: String
-    Default: 'v2.5.0'
+    Default: 'v2.6.0'
   Achillesv:
     Description: OHDSI Achilles GitHub branch you want deployed (this specifies the version)
     Type: String
@@ -421,7 +424,7 @@ Parameters:
   PatientLevelPredictionv:
     Description: OHDSI PatientLevelPrediction GitHub branch you want deployed (this specifies the version)
     Type: String
-    Default: 'v2.0.5'
+    Default: 'v3.0.0'
   CohortMethodv:
     Description: OHDSI CohortMethod GitHub branch you want deployed (this specifies the version)
     Type: String
@@ -510,6 +513,7 @@ Resources:
         UseACMBoolean: !Ref 'UseACMBoolean'
         UseRoute53Boolean: !Ref 'UseRoute53Boolean'
         SourcesBucket: !Ref SourcesBucket
+        SageMakerBucket: !Ref SageMakerBucket
         VPCcidr: !Ref VPCcidr
         p1cidr: !Ref p1cidr
         p2cidr: !Ref p2cidr
@@ -517,6 +521,7 @@ Resources:
         a2cidr: !Ref a2cidr
         d1cidr: !Ref d1cidr
         d2cidr: !Ref d2cidr
+
   certificate:
     Condition: DeployACM
     Type: AWS::CloudFormation::Stack
@@ -526,13 +531,40 @@ Resources:
         R53DomainName: !Join ['', [!Ref DomainName, '.', !Ref HostedZoneName]]
         SubjectAlternativeNames: !Join ['', ['rstudio.', !Ref DomainName, '.', !Ref HostedZoneName]]
       TemplateURL: https://s3.amazonaws.com/ohdsi-rstudio/01-certificate-ohdsi.yaml
-  RStudioStack:
+
+  DatabasesStack:
     Type: AWS::CloudFormation::Stack
     DependsOn: VPCStack
+    Properties:
+      TemplateURL: https://s3.amazonaws.com/ohdsi-rstudio/02-databases-ohdsi.yaml
+      Parameters:
+        DatabaseMasterPassword:
+          !Ref DatabaseMasterPassword
+        DatabaseInstanceType:
+          !Ref DatabaseInstanceType
+        RedshiftInstanceType: 
+          !Ref 'RedshiftInstanceType'
+        NumRedshiftNodes: 
+          !Ref 'NumRedshiftNodes'
+        MultiAZDatabase:
+          !Ref MultiAZDatabase
+        SubnetDataA:
+          !GetAtt 'VPCStack.Outputs.SubnetDataA'
+        SubnetDataB:
+          !GetAtt 'VPCStack.Outputs.SubnetDataB'
+        SGData:
+          !GetAtt 'VPCStack.Outputs.SGData'
+        RSRoleArn: 
+          !GetAtt 'VPCStack.Outputs.RSRoleArn'
+
+  RStudioStack:
+    Type: AWS::CloudFormation::Stack
+    DependsOn: DatabasesStack
     Properties:
       TemplateURL: https://s3.amazonaws.com/ohdsi-rstudio/02-rstudio-ohdsi.yaml
       Parameters:
         RStudioInstanceProfile: !GetAtt 'VPCStack.Outputs.RStudioInstanceProfile'
+        SageMakerBucket: !Ref SageMakerBucket
         VPCSubnet: !GetAtt 'VPCStack.Outputs.SubnetAppA'
         VPCId: !GetAtt 'VPCStack.Outputs.VPCId'  
         RStudioSecurityGroup: !GetAtt 'VPCStack.Outputs.SGApp'
@@ -550,22 +582,19 @@ Resources:
         EmpiricalCalibrationv: !Ref 'EmpiricalCalibrationv'
         OhdsiSharingv: !Ref 'OhdsiSharingv'
         Achillesv: !Ref 'Achillesv'
+        RDSEndpoint: !GetAtt 'DatabasesStack.Outputs.RDSEndpoint'
+        RedshiftEndpoint: !GetAtt 'DatabasesStack.Outputs.RedshiftEndpoint'
+        Sources: !Ref Sources
+        DatabaseMasterPassword: !Ref DatabaseMasterPassword
+
   ohdsielasticbeanstalk:
-    DependsOn: [ VPCStack, RStudioStack ]
+    DependsOn: [ RStudioStack ]
     Type: AWS::CloudFormation::Stack
     Properties:
       Parameters:
         EBBucket: !Join [ "", [ !Ref "AWS::AccountId", '-', !Select [ 1, !Split [ '-', !GetAtt 'VPCStack.Outputs.SubnetPublicA'] ], '-atlas' ] ]
         DatabaseMasterPassword:
           !Ref DatabaseMasterPassword
-        DatabaseInstanceType:
-          !Ref DatabaseInstanceType
-        RedshiftInstanceType: 
-          !Ref 'RedshiftInstanceType'
-        NumRedshiftNodes: 
-          !Ref 'NumRedshiftNodes'
-        MultiAZDatabase:
-          !Ref MultiAZDatabase
         Sources:
           !Ref Sources
         SourcesBucket:
@@ -614,26 +643,24 @@ Resources:
           !GetAtt 'VPCStack.Outputs.SubnetAppA'
         SubnetAppB:
           !GetAtt 'VPCStack.Outputs.SubnetAppB'
-        SubnetDataA:
-          !GetAtt 'VPCStack.Outputs.SubnetDataA'
-        SubnetDataB:
-          !GetAtt 'VPCStack.Outputs.SubnetDataB'
         SGPublic:
           !GetAtt 'VPCStack.Outputs.SGPublic'
         SGApp:
           !GetAtt 'VPCStack.Outputs.SGApp'
-        SGData:
-          !GetAtt 'VPCStack.Outputs.SGData'
         EBServiceRole:
           !GetAtt 'VPCStack.Outputs.EBServiceRole'      
         EBInstanceProfile:
           !GetAtt 'VPCStack.Outputs.EBInstanceProfile'
         TempEC2InstanceProfile:
           !GetAtt 'VPCStack.Outputs.TempEC2InstanceProfile'
-        RSRoleArn: 
-          !GetAtt 'VPCStack.Outputs.RSRoleArn'
         RStudioTargetGroupArn:
           !GetAtt 'RStudioStack.Outputs.RStudioTargetGroupArn'
+        RDSEndpoint: 
+          !GetAtt 'DatabasesStack.Outputs.RDSEndpoint'
+        RedshiftEndpoint: 
+          !GetAtt 'DatabasesStack.Outputs.RedshiftEndpoint'
+        RSRoleArn: 
+          !GetAtt 'VPCStack.Outputs.RSRoleArn'
       TemplateURL: https://s3.amazonaws.com/ohdsi-rstudio/03-application-ohdsi.yaml
   route53:
     Condition: DeployRoute53

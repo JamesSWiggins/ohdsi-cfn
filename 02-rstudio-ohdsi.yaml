@@ -353,7 +353,8 @@ Resources:
             sudo R --no-save << R_SCRIPT
             library(devtools)
             #Used to give access to AWS S3 for reading and writing data
-            devtools::install_github("cloudyr/aws.s3")
+            install.packages("aws.ec2metadata", repos = "http://cloudyr.github.io/drat")
+            install.packages("aws.s3", repos = "http://cloudyr.github.io/drat")
             #Newer versions of httpuv cause problems with R Shiny applications
             devtools::install_version("httpuv", version = "1.4.5", repos = "http://cran.us.r-project.org")
             #Latest version of PythonInR (0.1-6) gives the error Python.h: No such file or directory. Try "sudo apt-get install python-dev"
@@ -389,6 +390,7 @@ Resources:
             sudo pip install boto3==1.7.52
             sudo pip install sagemaker
             sudo pip install mxnet
+            sudo pip install pandas
 
             region=`curl http://169.254.169.254/latest/dynamic/instance-identity/document|grep region|awk -F\" '{print $4}'`
             count=1

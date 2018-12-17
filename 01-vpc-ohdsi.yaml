@@ -639,7 +639,9 @@ Resources:
               - !Join [ "", [ 'arn:aws:s3:::', !Ref SourcesBucket ] ]
               - !Join [ "", [ 'arn:aws:s3:::', !Ref SourcesBucket, '/*' ] ]    
               - !Join [ "", [ 'arn:aws:s3:::', !Ref SageMakerBucket ] ]    
-              - !Join [ "", [ 'arn:aws:s3:::', !Ref SageMakerBucket, '/*' ] ] 
+              - !Join [ "", [ 'arn:aws:s3:::', !Ref SageMakerBucket, '/*' ] ]
+              - !Join [ "", [ 'arn:aws:s3:::', !Ref "AWS::AccountId", '-', !Select [ 1, !Split [ '-', !Ref 'subnetbae43ff1'] ], '-sagemakerplp' ] ]
+              - !Join [ "", [ 'arn:aws:s3:::', !Ref "AWS::AccountId", '-', !Select [ 1, !Split [ '-', !Ref 'subnetbae43ff1'] ], '-sagemakerplp/*' ] ]
           - Effect: Allow
             Action: 
               - "iam:GetRole"

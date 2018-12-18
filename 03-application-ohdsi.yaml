@@ -43,38 +43,19 @@ Parameters:
       - m4.large 
       - m4.xlarge 
       - m4.2xlarge 
-      - m4.4xlarge 
-      - m4.10xlarge 
-      - m4.16xlarge 
       - m5.large 
       - m5.xlarge 
       - m5.2xlarge 
-      - m5.4xlarge 
-      - m5.12xlarge 
-      - m5.24xlarge 
       - c4.large 
       - c4.xlarge 
       - c4.2xlarge 
-      - c4.4xlarge 
-      - c4.8xlarge 
       - c5.large 
       - c5.xlarge 
       - c5.2xlarge 
-      - c5.4xlarge 
-      - c5.9xlarge 
-      - c5.18xlarge
       - r4.large 
       - r4.xlarge 
-      - r4.2xlarge 
-      - r4.4xlarge 
-      - r4.8xlarge 
-      - r4.16xlarge
       - r5.large 
       - r5.xlarge 
-      - r5.2xlarge 
-      - r5.4xlarge 
-      - r5.8xlarge 
-      - r5.16xlarge 
     ConstraintDescription: Must be a valid Amazon EC2 instance type.
     Default: t2.micro
     Description: The Amazon EC2 instance type for your web instances.
@@ -223,6 +204,64 @@ Mappings:
       AMI: ami-ebc47185
     ap-northeast-3:
       AMI: ami-09b8b674
+  
+  tomcatconfig:
+    t2.micro:
+      Xmx: 512m
+    t2.small:
+      Xmx: 1024m
+    t2.medium: 
+      Xmx: 2048m
+    t2.large:
+      Xmx: 4096m
+    t2.xlarge:
+      Xmx: 8192m
+    t2.2xlarge:
+      Xmx: 16384m
+    t3.micro:
+      Xmx: 512m
+    t3.small:
+      Xmx: 1024m
+    t3.medium:
+      Xmx: 2048m
+    t3.large:
+      Xmx: 4096m
+    t3.xlarge:
+      Xmx: 8192m
+    t3.2xlarge:
+      Xmx: 16384m
+    m4.large:
+      Xmx: 4096m
+    m4.xlarge:
+      Xmx: 8192m
+    m4.2xlarge:
+      Xmx: 16384m
+    m5.large:
+      Xmx: 4096m
+    m5.xlarge:
+      Xmx: 8192m
+    m5.2xlarge:
+      Xmx: 16384m
+    c4.large:
+      Xmx: 2048m
+    c4.xlarge:
+      Xmx: 4096m
+    c4.2xlarge:
+      Xmx: 8192m
+    c5.large:
+      Xmx: 2048m
+    c5.xlarge:
+      Xmx: 4096m
+    c5.2xlarge:
+      Xmx: 8192m
+    r4.large:
+      Xmx: 8192m
+    r4.xlarge:
+      Xmx: 16384m
+    r5.large:
+      Xmx: 8192m
+    r5.xlarge:
+      Xmx: 16384m
 
 
 Conditions:
@@ -371,7 +410,9 @@ Resources:
         - Namespace: aws:elasticbeanstalk:environment:process:https
           OptionName: StickinessEnabled
           Value: true  
-
+        - Namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
+          OptionName: Xmx
+          Value: !FindInMap [tomcatconfig, !Ref WebInstanceType, Xmx]    
 
 
   OHDSIEnvironmentNoACM:
@@ -486,6 +527,9 @@ Resources:
         - Namespace: aws:elasticbeanstalk:environment:process:https
           OptionName: StickinessEnabled
           Value: true 
+        - Namespace: aws:elasticbeanstalk:container:tomcat:jvmoptions
+          OptionName: Xmx
+          Value: !FindInMap [tomcatconfig, !Ref WebInstanceType, Xmx]    
 
 
 # This is a temporary EC2 server used to add the necessary Elastic Beanstalk scripts to the Project REDCap source code zip file.

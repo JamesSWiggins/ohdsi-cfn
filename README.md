@@ -21,7 +21,7 @@ The features of using this architecture are as follows:
 * [The design results in a reasonable monthly cost](https://calculator.s3.amazonaws.com/index.html#r=IAD&key=calc-42CFC1C0-3356-4A35-8697-0A9567A8EA3B) 
 
 A high-level diagram showing how the different functions of REDCap map to AWS Services is shown below.  
-![alt-text](https://github.com/vanderbilt-redcap/ohdsi-cfn/blob/master/images/ohdsi_architecture_block_diagram.png "AWS OHDSI High-Level Diagram")
+![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/ohdsi_architecture_block_diagram.png "AWS OHDSI High-Level Diagram")
 
 Starting from the user, public Internet DNS services are (optionally) provided by **Amazon Route 53**.  This gives you the ability to automatically add a domain to an existing hosted zone in Route 53 (i.e. redcap.example.edu if example.edu is already hosted in Route 53).  In addition, if you are deploying a new domain to Route 53, an SSL certificate can be automatically generated and applied using **AWS Certificate Manager (ACM)**.  This enables HTTPS communication and ensures the data sent from the users is encrypted in-transit (in accordance with HIPAA).  HTTPS communication is also used between the Application Load Balancers and the REDCap servers.
 

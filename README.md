@@ -4,29 +4,24 @@
 
 <a href="https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://s3.amazonaws.com/ohdsi-rstudio/00-master-ohdsi.yaml" target="_blank"><img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></a> 
 
-Click the launch button above to begin the process of deploying a REDCap environment on AWS CloudFormation. NOTE: This launch button already has the *US East* region pre-selected as part of the URL (i.e., &region=us-east-1), but once you click the button, you can change your preferred deployment region in AWS by selecting it from the top bar of the AWS Console, after which you may need to provide the Amazon S3 Template URL (https://s3.amazonaws.com/redcap-aws-cloudformation/00-master-rc.yaml).
+Click the launch button above to begin the process of deploying an OHDSI environment on AWS CloudFormation. NOTE: This launch button already has the *U.S. Northen Virginia* region pre-selected as part of the URL (i.e., &region=us-east-1), but once you click the button, you can change your preferred deployment region in AWS by selecting it from the top bar of the AWS Console, after which you may need to provide the Amazon S3 Template URL (https://s3.amazonaws.com/ohdsi-rstudio/00-master-ohdsi.yaml).
 
 ## Summary
-This repository contains AWS CloudFormation templates to automatically deploy a REDCap environment that adheres to AWS architectural best practices.  In order to use this automation, you must supply your own copy of the REDCap source files.  These are available for qualified entities at https://projectredcap.org.  Once you have downloaded your source files then you can follow the below instructions for deployment.
+The Observational Health Data Sciences and Informatics [(OHDSI, pronounced "Odyssey") community](https://www.ohdsi.org/) is working toward this goal by producing data standards and open-source solutions to store and analyze observational health data.  This repository provides automation to deploy some of the OHDSI projects (Atlas, Achilles, WebAPI, PatientLevelPrediction and the OMOP Common Data Model) into AWS. By doing so, you can quickly and inexpensively implement a health data science and informatics environment.
 
-In their own words: "REDCap is a secure web application for building and managing online surveys and databases. While REDCap can be used to collect virtually any type of data (including 21 CFR Part 11, FISMA, and HIPAA-compliant environments), it is specifically geared to support online or offline data capture for research studies and operations. The REDCap Consortium, a vast support network of collaborators, is composed of thousands of active institutional partners in over one hundred countries who utilize and support REDCap in various ways."
-
-**NOTE: REDCap 8.9.3 or higher is required for using this AWS CloudFormation template.** Earlier versions of REDCap may not install correctly and will not be able to utilize the Easy Upgrade feature.
-
-You must be a REDCap consortium partner in order to utilize this AWS CloudFormation template. But once your institution is a partner, no additional licenses with Vanderbilt are required for running REDCap on AWS.
-
-## REDCap on AWS architecture and features
+## OHDSI on AWS architecture and features
 The features of using this architecture are as follows:
-* A complete and ready-to-use REDCap environment is automatically deployed in about 20 minutes.
-* REDCap is deployed in an isolated, three-tiered Virtual Private Cloud
-* The environment enables automatic scaling up and down based on load
-* Data is encrypted by default at rest and in flight (in accordance with HIPAA)
-* Managed services are used that provide automated patching and maintenance of OS, middleware, and database software
-* Database backups are performed automatically to enable operational and disaster recovery
+* It’s deployed in an isolated, three-tier Amazon Virtual Private Cloud (Amazon VPC).
+* It deploys the OMOP CDM with clinical and vocabulary data, Atlas, WebAPI, Achilles, and RStudio with PatientLevelPrediction, CohortMethod, and many other R libraries.
+* It uses data-at-rest and in-flight encryption to respect the requirements of HIPAA.
+* It uses managed services from AWS; OS, middleware, and database patching and maintenance is largely automatic.
+* It creates automated backups for operational and disaster recovery.
+* It’s built automatically in just a few hours.
+* Environments can be configured from very small to peta-byte scale, geographically redundant implementations by providing different deployment parameters.
 * [The design results in a reasonable monthly cost](https://calculator.s3.amazonaws.com/index.html#r=IAD&key=calc-42CFC1C0-3356-4A35-8697-0A9567A8EA3B) 
 
 A high-level diagram showing how the different functions of REDCap map to AWS Services is shown below.  
-![alt-text](https://github.com/vanderbilt-redcap/redcap-aws-cloudformation/blob/master/images/AWS%20Project%20REDCap%20Block%20Diagram.png "AWS REDCap High-Level Diagram")
+![alt-text](https://github.com/vanderbilt-redcap/ohdsi-cfn/blob/master/images/ohdsi_architecture_block_diagram.png "AWS OHDSI High-Level Diagram")
 
 Starting from the user, public Internet DNS services are (optionally) provided by **Amazon Route 53**.  This gives you the ability to automatically add a domain to an existing hosted zone in Route 53 (i.e. redcap.example.edu if example.edu is already hosted in Route 53).  In addition, if you are deploying a new domain to Route 53, an SSL certificate can be automatically generated and applied using **AWS Certificate Manager (ACM)**.  This enables HTTPS communication and ensures the data sent from the users is encrypted in-transit (in accordance with HIPAA).  HTTPS communication is also used between the Application Load Balancers and the REDCap servers.
 

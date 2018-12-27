@@ -36,7 +36,7 @@ Starting from the user, public Internet DNS services are (optionally) provided b
 **Amazon SageMaker** is used to build, train, and deploy machine learning models to predict patient health outcomes developed with the OHDSI PatientLevelPrediction R package.  Amazon SageMaker is a fully-managed service that covers the entire machine learning workflow to label and prepare your data, choose an algorithm, train the algorithm, tune and optimize it for deployment, make predictions, and take action. Your models get to production faster with much less effort and lower cost.
 
 A more detailed, network-oriented diagram of this environment is shown following.
-![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/ohdsi_architecture_block_diagram.png "AWS OHDSI Network Diagram")
+![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/ohdsi_architecture_network_diagram.png "AWS OHDSI Network Diagram")
 
 ## OHDSI on AWS deployment instructions
 Before deploying an application on AWS that transmits, processes, or stores protected health information (PHI) or personally identifiable information (PII), address your organization's compliance concerns. Make sure that you have worked with your internal compliance and legal team to ensure compliance with the laws and regulations that govern your organization. To understand how you can use AWS services as a part of your overall compliance program, see the [AWS HIPAA Compliance whitepaper](https://d0.awsstatic.com/whitepapers/compliance/AWS_HIPAA_Compliance_Whitepaper.pdf). With that said, we paid careful attention to the HIPAA control set during the design of this solution.

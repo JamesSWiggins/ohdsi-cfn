@@ -66,9 +66,9 @@ If you do not intend to use Route 53 and ACM to automatically generate and provi
 | Elastic Beanstalk Endpoint Name | **Required** This unique name will be combined with [AWS Region identifier](https://docs.aws.amazon.com/general/latest/gr/rande.html#elasticbeanstalk_region) (i.e. ```us-east-1```) to determine the web address for your Atlas and RStudio servers.  The Elastic Beanstalk URL (will be rendered http://(EBEndpointName).(region).elasticbeanstalk.com).  You can check to see if an endpoint name is in use by checking for an existing DNS entry using the 'nslookup' command from your Windows, MacOS, or Linux terminal: ```# nslookup (EBEndpoint).(region).elasticbeanstalk.com```.  If nslookup returns an IP address, that means that the name is in use and you should pick a different name. You need to pick an Elastic Beanstalk Endpoint Name even if you are using a Route53 DNS entry. |
 | Use Route 53? | If you select **True**, a DNS record will automatically be created using the Route53 parameters below.  If you select **False**, then the Elastic Beanstalk assigned domain name will be used. |
 | Apply SSL Certificate? | Requires the use of Route53.  If you select **True**, an SSL certificate will be automatically generated for your domain name using AWS Certificate Manager (ACM). If you select **False**, HTTP will be used and an SSL certificate can be applied after deployment. |
-| Route53 Hosted Zone ID | Optional, only if using Route53.  The Route 53 hosted zone ID to create the site domain in (e.g. Z2FDTNDATAQYW2).  You can find this value by looking up your Hosted Zone in the [Route53 Management Console](https://console.aws.amazon.com/route53/). |
-| Route53 Hosted Zone Domain Name | Optional, only if using Route53.  The Route 53 hosted zone domain name to create the site domain in (e.g. example.edu).  You can find this value by looking up your Hosted Zone in the [Route53 Management Console](https://console.aws.amazon.com/route53/). |
-| Route53 Site Domain | Optional, only if using Route53.  The sub-domain name you want to use for your OHDSI implementation. This name will be prepended your specified Hosted Zone Domain Name (e.g. ohdsi in ohdsi.example.edu). |
+| Route53 Hosted Zone ID | Optional, only needed if using Route53.  The Route 53 hosted zone ID to create the site domain in (e.g. Z2FDTNDATAQYW2).  You can find this value by looking up your Hosted Zone in the [Route53 Management Console](https://console.aws.amazon.com/route53/). |
+| Route53 Hosted Zone Domain Name | Optional, only needed if using Route53.  The Route 53 hosted zone domain name to create the site domain in (e.g. example.edu).  You can find this value by looking up your Hosted Zone in the [Route53 Management Console](https://console.aws.amazon.com/route53/). |
+| Route53 Site Domain | Optional, only needed if using Route53.  The sub-domain name you want to use for your OHDSI implementation. This name will be prepended your specified Hosted Zone Domain Name (e.g. ohdsi in ohdsi.example.edu). |
 
 #### Database Tier
 |Parameter Name| Description|
@@ -92,6 +92,16 @@ To load these data sources automatically, you provide the schema names you want 
 Creating and S3 bucket and uploading the 'Source'.sql files:
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/upload_data_sources.gif "Uploading OMOP data sources.")
 
+#### Web Tier
+The web tier contains the Atlas/WebAPI Apache and Tomcat auto-scaling instances behind a load balancer.  This allows Atlas/WebAPI to be fault tolerant and highly available while also growing and shrinking the number of instances based on load.
+
+|Parameter Name| Description|
+|--------------|------------|
+| Web Tier Instance Type | This determines the processing power of your Atlas/WebAPI instances.  ```t2.micro``` should be sufficient for small implementations (5 or less concurrent users).  For more information, see the [list of available EC2 instnance types](https://aws.amazon.com/ec2/instance-types/). |
+| Minimum Atlas/WebAPI Instances | **Required** Specifies the minimum number of EC2 instances in the Web Autoscaling Group. A value of >1 will create a highly available environment by placing instances in multiple availability zones. |
+| Minimum Atlas/WebAPI Instances | **Required** Specifies the maximum number of EC2 instances in the Web Autoscaling Group. Must be greater than or equal to the Minimum Atlas/WebAPI Instances. |
+
+#### RStudio
 
 
 When you've provided appropriate values for the **Parameters**, choose **Next**.

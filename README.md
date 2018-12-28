@@ -48,9 +48,10 @@ If you do not intend to use Route 53 and ACM to automatically generate and provi
 
 0.2. This template must be run by an AWS IAM User who has sufficient permission to create the required resources.  These resources include:  VPC, IAM User and Roles, S3 Bucket, EC2 Instance, ALB, Elastic Beanstalk, Redshift Clusters, SageMaker models, Route53 entries, and ACM certificates.  If you are not an Administrator of the AWS account you are using, please check with them before running this template to ensure you have sufficient permission.  
 
+0.3. This template will create two S3 buckets.  By default, AWS accounts have a limit of 100 S3 buckets.  If you are near that limit, please either delete some unused S3 buckets or [request a limit increase](https://console.aws.amazon.com/support/cases#/create?issueType=service-limit-increase) before running this template.
+
 1. Begin the deployment process by clicking the **Launch Stack** button at the top of this page.  This will take you to the [CloudFormation Manage Console](https://console.aws.amazon.com/cloudformation/) and specify the OHDSI Cloudformation template URL (https://s3.amazonaws.com/ohdsi-rstudio/00-master-ohdsi.yaml).  In the top-right corner of the console, choose the AWS Region in which you'd like to deploy the OHDSI environment, and then click **Next**. 
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/ohdsi_launch_cfn_template.gif "CFN Select Template")
-
 
 2. The next screen will take in all of the parameters for your OHDSI environment.  A description is provided for each parameter to help explain its function, but following is also a detailed description of how to use each parameter.  At the top, provide a unique **Stack Name**.    
 
@@ -124,9 +125,10 @@ When you've provided appropriate values for the **Parameters**, choose **Next**.
 5. You can watch as CloudFormation builds out your OHDSI environment. A CloudFormation deployment is called a *stack*. The parent stack creates several child stacks depending on the parameters you provided.  When all the stacks have reached the green CREATE_COMPLETE status, as shown in the screenshot following, then the OHDSI architecture has been deployed.  Select the **Outputs** tab to find your OHDSI environment URLs.
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/click_outputs.gif "Clicking OHDSI Urls")
 
+### Troubleshooting Deploym
 
 ### Ongoing Operations
-At this point, you have a fully functioning and robust REDCap environment to begin using.  Following are some helpful points to consider regarding how to support this environment on-going.
+At this point, you have a fully functioning and robust OHDSI environment to begin using.  Following are some helpful points to consider regarding how to support this environment on-going.
 
 #### Web Security
 Consider implementing a [AWS Web Application Firewall (WAF)](https://aws.amazon.com/waf/) in front of your REDCap application to help protect against common web exploits that could affect availability, compromise security or consume excessive resources.  You can use AWS WAF to create custom rules that block common attack patterns, such as SQL injection or cross-site scripting.  Learn more in the whitepaper ["Use AWS WAF to Mitigate OWASP’s Top 10 Web Application Vulnerabilities"](https://d0.awsstatic.com/whitepapers/Security/aws-waf-owasp.pdf) .  You can deploy AWS WAF on either Amazon CloudFront as part of your CDN solution or on the Application Load Balancer (ALB) that was deployed as a part of this solution.

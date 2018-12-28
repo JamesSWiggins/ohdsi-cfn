@@ -70,7 +70,7 @@ If you do not intend to use Route 53 and ACM to automatically generate and provi
 | Route53 Hosted Zone Domain Name | Optional, only if using Route53.  The Route 53 hosted zone domain name to create the site domain in (e.g. example.edu).  You can find this value by looking up your Hosted Zone in the [Route53 Management Console](https://console.aws.amazon.com/route53/). |
 | Route53 Site Domain | Optional, only if using Route53.  The sub-domain name you want to use for your OHDSI implementation. This name will be prepended your specified Hosted Zone Domain Name (e.g. ohdsi in ohdsi.example.edu). |
 
-####Database Tier
+#### Database Tier
 |Parameter Name| Description|
 |--------------|------------|
 | Use Primary and Standy Database Instances? | Specifies whether to deploy the AWS Aurora PostgreSQL WebAPI database in a Multi-AZ configuration.  This provides a stand-by database for high availability in the event the primary database fails. |
@@ -79,7 +79,7 @@ If you do not intend to use Route 53 and ACM to automatically generate and provi
 | Number of nodes in your Redshift cluster | **Required** The number of nodes determines the overall processing power and storage space of your OMOP CDM data warehouse.  Additional scaling details can be found in [the Redshift documentation](https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html#rs-about-clusters-and-nodes). |
 | Aurora PostgreSQL and Redshift master password | **Required** This password will be used for the ```master``` user of the Aurora PostgreSQL WebAPI database and the Redshift OMOP CDM data warehouse.  It must have a length of 8-41 and be letters (upper or lower), numbers, and/or these special characters ```~#%^*_+,-```.
 
-####Database Tier - Sources
+#### Database Tier - Sources
 These parameters allow you to specify any number of OMOP formatted data sources that will be automatically loaded into your OHDSI environment.  After they are loaded, the Achilles project will be used to populate a Results schema for each source enabling population-level visualizations within Atlas and also data quality feedback from Achilles Heel.  
 
 To load these data sources automatically, you provide the schema names you want to use (i.e. CMSDESynPUF1k) and an S3 bucket that contains matching named files (i.e. CMSDESynPUF1k.sql) with Redshift-compatible SQL statements to load the OMOP tables.  Examples of these load files can be found in this repository [CMSDESynPUF1k.sql](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/CMSDESynPUF1k.sql) and [CMSDESynPUF23m](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/CMSDESynPUF23m.sql).  Please note the top of the files must set the search path to the specified schema name (i.e. ```SET search_path to CMSDESynPUF1k;```).  Documnetation provides more information on [using the Redshift COPY command](https://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html).

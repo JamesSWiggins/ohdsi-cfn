@@ -12,9 +12,6 @@ The Observational Health Data Sciences and Informatics [(OHDSI, pronounced "Odys
 ## Topics
 * [OHDSI on AWS architecture and features](#ohdsi-on-aws-architecture-and-features)
 * [OHDSI on AWS deployment instructions](#ohdsi-on-aws-deployment-instructions)
-    [If you intend to use Route 53 for DNS or ACM to provide an SSL certificate](##if-you-intend-to-use-route-53-for-dns-or-acm-to-provide-an-ssl-certificate)
-    [
-    
 * [Troubleshooting Deployments](#troubleshooting-deployments)
 * [Ongoing Operations](#on-going-operations)
 

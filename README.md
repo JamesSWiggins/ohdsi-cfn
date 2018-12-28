@@ -102,18 +102,28 @@ The web tier contains the Atlas/WebAPI Apache and Tomcat auto-scaling instances 
 | Minimum Atlas/WebAPI Instances | **Required** Specifies the maximum number of EC2 instances in the Web Autoscaling Group. Must be greater than or equal to the Minimum Atlas/WebAPI Instances. |
 
 #### RStudio
+|Parameter Name| Description|
+|--------------|------------|
+| Instance Type for RStudio | This determines the processing power of your multi-user RStudio instance.  About 0.75GB per concurrent user is recommended.  For more information, see the [list of available EC2 instnance types](https://aws.amazon.com/ec2/instance-types/). |
+| Home Directory size for RStudio instance | The amount of encrypted disk space, in GBs, allocated to store RStudio user's local data. |
+| Comma-delimited user list for RStudio | Provide a comma separated list of usernames and passwords (user1,pass1,user2,pass2) to create on the RStudio Server. The first user in the list will be given sudoers access. |
+| Bucket for PatientLevelPrediction SageMaker Models | Name of the S3 bucket you want to use to hold the PatientLevelPrediction training data and model output for SageMaker.  If you leave this blank a bucket will be generated for you. |
 
+#### OHDSI Component Versions
+This parameters section contains a list of the OHDSI components that will be deployed in your environment and allows you to provide the version number as a parameter.  Default versions are provided that work well together, but you can provide your own version numbers if you desire.  The version number here must map to a **tagged release** or **branch** for that component in it's GitHub repository.  For instance, this is the [list of tagged releases for the OHDSI WebAPI project](https://github.com/OHDSI/WebAPI/tags).
+
+#### VPC Networking
+As a part of this deployment a new [AWS Virtual Private Cloud (VPC)](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) is created using private network addressing.  This parameters section allows you to provide your own addresses for this VPC which can be useful if you want to establish a [VPN connection](https://docs.aws.amazon.com/vpc/latest/userguide/vpn-connections.html), [AWS Direct Connect connection](https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html), or [VPC Peering connection](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).
 
 When you've provided appropriate values for the **Parameters**, choose **Next**.
 
 3. On the next screen, you can provide some other optional information like tags at your discretion, or just choose **Next**.
 
-4. On the next screen, you can review what will be deployed. At the bottom of the screen, there is a check box for you to acknowledge that **AWS CloudFormation might create IAM resources with custom names**. This is correct; the template being deployed creates four custom roles that give permission for the AWS services involved to communicate with each other. Details of these permissions are inside the CloudFormation template referenced in the URL given in the first step. Check the box acknowledging this and choose **Next**.
+4. On the next screen, you can review what will be deployed. At the bottom of the screen, there is a check box for you to acknowledge that **AWS CloudFormation might create IAM resources with custom names** and **AWS CloudFormation might require the following capability: CAPABILITY_AUTO_EXPAND**. This is correct; the template being deployed creates four custom roles that give permission for the AWS services involved to communicate with each other. Details of these permissions are inside the CloudFormation template referenced in the URL given in the first step. Check the box acknowledging this and choose **Next**.
 
-5. You can watch as CloudFormation builds out your REDCap environment. A CloudFormation deployment is called a *stack*. The parent stack creates several child stacks depending on the parameters you provided.  When all the stacks have reached the green CREATE_COMPLETE status, as shown in the screenshot following, then the REDCap architecture has been deployed.  Select the **Outputs** tab to find your REDCap environment URL.
-![alt-text](https://github.com/JamesSWiggins/project-redcap-aws-automation/blob/master/images/redcap_cfn_stack_complete.png "CFN Stack Complete")
+5. You can watch as CloudFormation builds out your OHDSI environment. A CloudFormation deployment is called a *stack*. The parent stack creates several child stacks depending on the parameters you provided.  When all the stacks have reached the green CREATE_COMPLETE status, as shown in the screenshot following, then the OHDSI architecture has been deployed.  Select the **Outputs** tab to find your OHDSI environment URLs.
+![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/click_outputs.gif "Clicking OHDSI Urls")
 
-6. After clicking on the provided URL, you will be taken to the REDCap login screen.  You can login by using the username 'redcap_admin' and the password you provided in the **DB Master Password Parameter**.  You will immediately be asked to change the password.
 
 ### Ongoing Operations
 At this point, you have a fully functioning and robust REDCap environment to begin using.  Following are some helpful points to consider regarding how to support this environment on-going.

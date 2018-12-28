@@ -133,7 +133,9 @@ When you've provided appropriate values for the **Parameters**, choose **Next**.
 5. You can watch as CloudFormation builds out your OHDSI environment. A CloudFormation deployment is called a *stack*. The parent stack creates several child stacks depending on the parameters you provided.  When all the stacks have reached the green CREATE_COMPLETE status, as shown in the screenshot following, then the OHDSI architecture has been deployed.  Select the **Outputs** tab to find your OHDSI environment URLs.
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/click_outputs.gif "Clicking OHDSI Urls")
 
-6. Inside of each user's home directory in RStudio is a file called **ConnectionDetails.R**.  It contains all of the connection parameters needed to use OHDSI components like [PatientLevelPrediction](https://github.com/OHDSI/PatientLevelPrediction), [CohortMethod](https://github.com/OHDSI/CohortMethod), or [Achilles](https://github.com/OHDSI/Achilles).  
+
+#### Using RStudio
+Inside of each user's home directory in RStudio is a file called **ConnectionDetails.R**.  It contains all of the connection parameters needed to use OHDSI components like [PatientLevelPrediction](https://github.com/OHDSI/PatientLevelPrediction), [CohortMethod](https://github.com/OHDSI/CohortMethod), or [Achilles](https://github.com/OHDSI/Achilles).  
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/rstudio_connection_details.png "ConnectionDetails.R")
 
 These components and all of their dependencies are also pre-installed and can be invoke simply by issueing the command ```library(PatientLevelPrediction)```, ```library(CohortMethod)```, or ```library(Achilles)```.

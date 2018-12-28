@@ -12,6 +12,7 @@ The Observational Health Data Sciences and Informatics [(OHDSI, pronounced "Odys
 ## Topics
 * [OHDSI on AWS architecture and features](#ohdsi-on-aws-architecture-and-features)
 * [OHDSI on AWS deployment instructions](#ohdsi-on-aws-deployment-instructions)
+* [Using RStudio](#using-rstudio)
 * [Troubleshooting Deployments](#troubleshooting-deployments)
 * [Ongoing Operations](#on-going-operations)
 

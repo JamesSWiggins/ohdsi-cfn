@@ -52,7 +52,21 @@ If you do not intend to use Route 53 and ACM to automatically generate and provi
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/ohdsi_launch_cfn_template.gif "CFN Select Template")
 
 
-2. On the next screen, provide a **Stack Name** and a few other parameters for your REDCap environment.  A description is provided for each parameter to explain its function.  Please keep in mind that the **Elastic Beanstalk Endpoint Name** must be unique within your AWS Region.  You can check to see if an endpoint name is in use by checking for an existing DNS entry using the 'nslookup' command (nslookup (EBEndpoint).(region).elasticbeanstalk.com).  If the command returns an IP address, that means that the name is in use and you should pick a different name.  When you've provided appropriate values for the **Parameters**, choose **Next**.
+2. The next screen will take in all of the parameters for your OHDSI environment.  A description is provided for each parameter to help explain its function, but following is also a detailed description of how to use each parameter.  At the top, provide a unique **Stack Name**.    
+
+#### General AWS
+|Parameter Name| Description|
+|---------------|-----------|
+| EC2 Key Pair | **Required** You must choose a key pair.  This will allow you SSH access into your WebAPI/Atlas and RStudio instances.  To learn more about administering the instances in this OHDSI environment, see the **On-going Operations** section below.|
+| Limit access to IP address range? | **Required** This parameter allows you to limit the IP address range that can access your Atlas and RStudio servers.  It uses [CIDR notation](https://en.wikipedia.org/wiki/Classless_Inter-Domain_Routing).  The default of 0.0.0.0/0 will allow access from any address.|
+
+#### DNS and SSL
+|Parameter Name| Description|
+|--------------|------------|
+| Elastic Beanstalk Endpoint Name | **Required** This will determine the web address for your Atlas and RStudio servers.  The unique name to use for your Elastic Beanstalk URL (will be rendered http://(EBEndpoint).(region).elasticbeanstalk.com).  You can check to see if an endpoint name is in use by checking for an existing DNS entry using the 'nslookup' command from your Windows, MacOS, or Linux terminal: ```#nslookup (EBEndpoint).(region).elasticbeanstalk.com```.  If the command returns an IP address, that means that the name is in use and you should pick a different name. 
+  
+
+When you've provided appropriate values for the **Parameters**, choose **Next**.
 
 3. On the next screen, you can provide some other optional information like tags at your discretion, or just choose **Next**.
 

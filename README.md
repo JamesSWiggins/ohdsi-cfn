@@ -9,6 +9,9 @@ Click the launch button above to begin the process of deploying an OHDSI environ
 ## Summary
 The Observational Health Data Sciences and Informatics [(OHDSI, pronounced "Odyssey") community](https://www.ohdsi.org/) is working toward this goal by producing data standards and open-source solutions to store and analyze observational health data.  This repository provides automation to deploy some of the OHDSI projects (Atlas, Achilles, WebAPI, PatientLevelPrediction and the OMOP Common Data Model) into AWS. By doing so, you can quickly and inexpensively implement a health data science and informatics environment.
 
+## Topics
+* [OHDSI on AWS architecture and features](#ohdsi-on-aws-architecture-and-features)
+
 ## OHDSI on AWS architecture and features
 The features of using this architecture are as follows:
 * It’s deployed in an isolated, three-tier Amazon Virtual Private Cloud (Amazon VPC).

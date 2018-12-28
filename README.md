@@ -134,12 +134,18 @@ When you've provided appropriate values for the **Parameters**, choose **Next**.
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/click_outputs.gif "Clicking OHDSI Urls")
 
 
-#### Using RStudio
+## Using RStudio
 Inside of each user's home directory in RStudio is a file called **ConnectionDetails.R**.  It contains all of the connection parameters needed to use OHDSI components like [PatientLevelPrediction](https://github.com/OHDSI/PatientLevelPrediction), [CohortMethod](https://github.com/OHDSI/CohortMethod), or [Achilles](https://github.com/OHDSI/Achilles).  
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/rstudio_connection_details.png "ConnectionDetails.R")
 
 These components and all of their dependencies are also pre-installed and can be invoke simply by issueing the command ```library(PatientLevelPrediction)```, ```library(CohortMethod)```, or ```library(Achilles)```.
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/rstudio_ohdsi_libraries.png "ConnectionDetails.R")
+
+Users can change their passwords after logging in by going to the **Terminal** and using the Linux ``# passwd`` command as shown following.
+![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/change_password.png "Change Password")
+
+New users can also be added to the RStudio server by logging in with a user who has sudo access and using the Linux ``# adduser`` command as shown following.  Recall that the first user you provided in the RStudio user list parameter was given sudo access.  
+![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/adduser.png "Add User")
 
 
 ## Troubleshooting Deployments

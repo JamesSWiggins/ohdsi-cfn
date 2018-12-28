@@ -63,8 +63,12 @@ If you do not intend to use Route 53 and ACM to automatically generate and provi
 #### DNS and SSL
 |Parameter Name| Description|
 |--------------|------------|
-| Elastic Beanstalk Endpoint Name | **Required** This will determine the web address for your Atlas and RStudio servers.  The unique name to use for your Elastic Beanstalk URL (will be rendered http://(EBEndpoint).(region).elasticbeanstalk.com).  You can check to see if an endpoint name is in use by checking for an existing DNS entry using the 'nslookup' command from your Windows, MacOS, or Linux terminal: ```#nslookup (EBEndpoint).(region).elasticbeanstalk.com```.  If the command returns an IP address, that means that the name is in use and you should pick a different name. 
-  
+| Elastic Beanstalk Endpoint Name | **Required** This unique name will be combined with [AWS Region identifier](https://docs.aws.amazon.com/general/latest/gr/rande.html#elasticbeanstalk_region) (i.e. ```us-east-1```) to determine the web address for your Atlas and RStudio servers.  The Elastic Beanstalk URL (will be rendered http://(EBEndpointName).(region).elasticbeanstalk.com).  You can check to see if an endpoint name is in use by checking for an existing DNS entry using the 'nslookup' command from your Windows, MacOS, or Linux terminal: ```# nslookup (EBEndpoint).(region).elasticbeanstalk.com```.  If nslookup returns an IP address, that means that the name is in use and you should pick a different name. You need to pick an Elastic Beanstalk Endpoint Name even if you are using a Route53 DNS entry. |
+| Use Route 53? | If you select **True**, a DNS record will automatically be created using the Route53 parameters below |
+| Apply SSL Certificate? | Requires the use of Route53.  Specifies whether an SSL certificate should be automatically generated for your domain name using AWS Certificate Manager (ACM). If one is not generated, HTTP will be used and an SSL certificate can be applied after deployment. |
+| Route53 Hosted Zone ID | Optional, only if using Route53.  The Route 53 hosted zone ID to create the site domain in (e.g. Z2FDTNDATAQYW2).  You can find this value by looking up your Hosted Zone in the [Route53 Management Console](https://console.aws.amazon.com/route53/). |
+| Route53 Hosted Zone Domain Name | Optional, only if using Route53.  The Route 53 hosted zone domain name to create the site domain in (e.g. example.edu).  You can find this value by looking up your Hosted Zone in the [Route53 Management Console](https://console.aws.amazon.com/route53/). |
+| Route53 Site Domain | Optional, only if using Route53.  The sub-domain name you want to use for your OHDSI implementation. This name will be prepended your specified Hosted Zone Domain Name (e.g. ohdsi in ohdsi.example.edu). |
 
 When you've provided appropriate values for the **Parameters**, choose **Next**.
 

@@ -11,6 +11,9 @@ The Observational Health Data Sciences and Informatics [(OHDSI, pronounced "Odys
 
 ## Topics
 * [OHDSI on AWS architecture and features](#ohdsi-on-aws-architecture-and-features)
+* [OHDSI on AWS deployment instructions](#ohdsi-on-aws-deployment-instructions)
+* [Troubleshooting Deployments](#troubleshooting-deployments)
+* [Ongoing Operations](#on-going-operations)
 
 ## OHDSI on AWS architecture and features
 The features of using this architecture are as follows:
@@ -130,6 +133,13 @@ When you've provided appropriate values for the **Parameters**, choose **Next**.
 5. You can watch as CloudFormation builds out your OHDSI environment. A CloudFormation deployment is called a *stack*. The parent stack creates several child stacks depending on the parameters you provided.  When all the stacks have reached the green CREATE_COMPLETE status, as shown in the screenshot following, then the OHDSI architecture has been deployed.  Select the **Outputs** tab to find your OHDSI environment URLs.
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/click_outputs.gif "Clicking OHDSI Urls")
 
+6. Inside of each user's home directory in RStudio is a file called **ConnectionDetails.R**.  It contains all of the connection parameters needed to use OHDSI components like [PatientLevelPrediction](https://github.com/OHDSI/PatientLevelPrediction), [CohortMethod](https://github.com/OHDSI/CohortMethod), or [Achilles](https://github.com/OHDSI/Achilles).  
+![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/rstudio_connection_details.png "ConnectionDetails.R")
+
+These components and all of their dependencies are also pre-installed and can be invoke simply by issueing the command ```library(PatientLevelPrediction)```, ```library(CohortMethod)```, or ```library(Achilles)```.
+![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/rstudio_ohdsi_libraries.png "ConnectionDetails.R")
+
+
 ## Troubleshooting Deployments
 
 #### CloudFormation Events
@@ -140,7 +150,7 @@ A CloudFormation deployment is called a *stack*.  The OHDSI template deploys a n
 During the build process a temporary Linux instance is created that compiles WebAPI, combines it with Atlas, loads all of your OMOP data sets into Redshift, runs Achilles, and performs various other configuration functions.  You can see a log of the work that it did by looking in the [**CloudWatch Logs Management Console** under the *Log Group* ```ohdsi-temporary-ec2-instance-build-log```](https://console.aws.amazon.com/cloudwatch/home?logs%3A=#logStream:group=ohdsi-temporary-ec2-instance-build-log).
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/cloudwatch_logs.gif "Browsing Cloudwatch Logs")
 
-## Ongoing Operations
+## On-going Operations
 At this point, you have a fully functioning and robust OHDSI environment to begin using.  Following are some helpful points to consider regarding how to support this environment on-going.
 
 #### Upgrading Atlas/WebAPI

@@ -127,7 +127,7 @@ When you've provided appropriate values for the **Parameters**, choose **Next**.
 5. You can watch as CloudFormation builds out your OHDSI environment. A CloudFormation deployment is called a *stack*. The parent stack creates several child stacks depending on the parameters you provided.  When all the stacks have reached the green CREATE_COMPLETE status, as shown in the screenshot following, then the OHDSI architecture has been deployed.  Select the **Outputs** tab to find your OHDSI environment URLs.
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/click_outputs.gif "Clicking OHDSI Urls")
 
-### Troubleshooting Deployments
+## Troubleshooting Deployments
 
 #### CloudFormation Events
 A CloudFormation deployment is called a *stack*.  The OHDSI template deploys a number of child or *nested* stacks depending on which options you choose.  If one of the steps in any of these stacks fail during deployment, all of the stacks will be *rolled back*, meaning that they will be deleted in the reverse order that they were deployed.  In order to understand why a deployment rolled back, it can be helpful to look at the *events* that CloudFormation recorded during deployment.  You can do this by looking at the Events tab of each stack.  If a stack has already been rolled back, you will have to change the *filter* in the upper-left corner of the CloudFormation Management Console from it's default of *Active* to *Deleted* to see it's event log.  A demonstration of this is shown following.
@@ -137,7 +137,7 @@ A CloudFormation deployment is called a *stack*.  The OHDSI template deploys a n
 During the build process a temporary Linux instance is created that compiles WebAPI, combines it with Atlas, loads all of your OMOP data sets into Redshift, runs Achilles, and performs various other configuration functions.  You can see a log of the work that it did by looking in the [**CloudWatch Logs Management Console** under the *Log Group* ```ohdsi-temporary-ec2-instance-build-log```](https://console.aws.amazon.com/cloudwatch/home?logs%3A=#logStream:group=ohdsi-temporary-ec2-instance-build-log).
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/cloudwatch_logs.gif "Browsing Cloudwatch Logs")
 
-### Ongoing Operations
+## Ongoing Operations
 At this point, you have a fully functioning and robust OHDSI environment to begin using.  Following are some helpful points to consider regarding how to support this environment on-going.
 
 #### Upgrading Atlas/WebAPI

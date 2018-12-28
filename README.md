@@ -64,11 +64,35 @@ If you do not intend to use Route 53 and ACM to automatically generate and provi
 |Parameter Name| Description|
 |--------------|------------|
 | Elastic Beanstalk Endpoint Name | **Required** This unique name will be combined with [AWS Region identifier](https://docs.aws.amazon.com/general/latest/gr/rande.html#elasticbeanstalk_region) (i.e. ```us-east-1```) to determine the web address for your Atlas and RStudio servers.  The Elastic Beanstalk URL (will be rendered http://(EBEndpointName).(region).elasticbeanstalk.com).  You can check to see if an endpoint name is in use by checking for an existing DNS entry using the 'nslookup' command from your Windows, MacOS, or Linux terminal: ```# nslookup (EBEndpoint).(region).elasticbeanstalk.com```.  If nslookup returns an IP address, that means that the name is in use and you should pick a different name. You need to pick an Elastic Beanstalk Endpoint Name even if you are using a Route53 DNS entry. |
-| Use Route 53? | If you select **True**, a DNS record will automatically be created using the Route53 parameters below |
-| Apply SSL Certificate? | Requires the use of Route53.  Specifies whether an SSL certificate should be automatically generated for your domain name using AWS Certificate Manager (ACM). If one is not generated, HTTP will be used and an SSL certificate can be applied after deployment. |
+| Use Route 53? | If you select **True**, a DNS record will automatically be created using the Route53 parameters below.  If you select **False**, then the Elastic Beanstalk assigned domain name will be used. |
+| Apply SSL Certificate? | Requires the use of Route53.  If you select **True**, an SSL certificate will be automatically generated for your domain name using AWS Certificate Manager (ACM). If you select **False**, HTTP will be used and an SSL certificate can be applied after deployment. |
 | Route53 Hosted Zone ID | Optional, only if using Route53.  The Route 53 hosted zone ID to create the site domain in (e.g. Z2FDTNDATAQYW2).  You can find this value by looking up your Hosted Zone in the [Route53 Management Console](https://console.aws.amazon.com/route53/). |
 | Route53 Hosted Zone Domain Name | Optional, only if using Route53.  The Route 53 hosted zone domain name to create the site domain in (e.g. example.edu).  You can find this value by looking up your Hosted Zone in the [Route53 Management Console](https://console.aws.amazon.com/route53/). |
 | Route53 Site Domain | Optional, only if using Route53.  The sub-domain name you want to use for your OHDSI implementation. This name will be prepended your specified Hosted Zone Domain Name (e.g. ohdsi in ohdsi.example.edu). |
+
+####Database Tier
+|Parameter Name| Description|
+|--------------|------------|
+| Use Primary and Standy Database Instances? | Specifies whether to deploy the AWS Aurora PostgreSQL WebAPI database in a Multi-AZ configuration.  This provides a stand-by database for high availability in the event the primary database fails. |
+| DB Instance Type | Determines processing power and memory capacity of the WebAPI database.  The default of ```r4.large``` should be sufficient for most environments.  Details of other instance types can be found in the [Amazon Aurora documentation](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Concepts.DBInstanceClass.html).|
+| Instance Type for Redshift cluster nodes | Determines the processing power and storage capacity of OMOP CDM data warehouse.  Additional speed and space can be added by choosing a larger Instance Type or by increasing the number of nodes (parameter below).  Additional scaling details can be found in [the Redshift documentation](https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html#rs-about-clusters-and-nodes). |
+| Number of nodes in your Redshift cluster | **Required** The number of nodes determines the overall processing power and storage space of your OMOP CDM data warehouse.  Additional scaling details can be found in [the Redshift documentation](https://docs.aws.amazon.com/redshift/latest/mgmt/working-with-clusters.html#rs-about-clusters-and-nodes). |
+| Aurora PostgreSQL and Redshift master password | **Required** This password will be used for the ```master``` user of the Aurora PostgreSQL WebAPI database and the Redshift OMOP CDM data warehouse.  It must have a length of 8-41 and be letters (upper or lower), numbers, and/or these special characters ```~#%^*_+,-```.
+
+####Database Tier - Sources
+These parameters allow you to specify any number of OMOP formatted data sources that will be automatically loaded into your OHDSI environment.  After they are loaded, the Achilles project will be used to populate a Results schema for each source enabling population-level visualizations within Atlas and also data quality feedback from Achilles Heel.  
+
+To load these data sources automatically, you provide the schema names you want to use (i.e. CMSDESynPUF1k) and an S3 bucket that contains matching named files (i.e. CMSDESynPUF1k.sql) with Redshift-compatible SQL statements to load the OMOP tables.  Examples of these load files can be found in this repository [CMSDESynPUF1k.sql](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/CMSDESynPUF1k.sql) and [CMSDESynPUF23m](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/CMSDESynPUF23m.sql).  Please note the top of the files must set the search path to the specified schema name (i.e. ```SET search_path to CMSDESynPUF1k;```).  Documnetation provides more information on [using the Redshift COPY command](https://docs.aws.amazon.com/redshift/latest/dg/r_COPY.html).
+
+|Parameter Name| Description|
+|--------------|------------|
+| Comma-delimited list of OMOP CDM schema sources to load into the Redshift datawarehouse | Comma-delimited list of OMOP CDM schema sources to load into the Redshift datawarehouse |
+| S3 Bucket that contains DDL SQL files name after each 'Source'.sql that will be executed to load data into the OMOP CDM schema sources. | S3 Bucket that contains DDL SQL files name after each 'Source'.sql that will be executed to load data into the OMOP CDM schema sources. |
+
+Creating and S3 bucket and uploading the 'Source'.sql files:
+![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/upload_data_sources.gif "Uploading OMOP data sources.")
+
+
 
 When you've provided appropriate values for the **Parameters**, choose **Next**.
 

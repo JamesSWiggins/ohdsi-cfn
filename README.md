@@ -143,6 +143,7 @@ At this point, you have a fully functioning and robust OHDSI environment to begi
 #### Upgrading Atlas/WebAPI
 
 <a href="https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://s3.amazonaws.com/ohdsi-rstudio/upgrade_atlas_webapi.yaml" target="_blank"><img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></a> 
+
 Click the above **Launch Stack** button to deploy a CloudFormation template that will allow you to specify a new version of Atlas and WebAPI.  It will then download and compile this new version with the parameters you supply and replace your current version running within Elastic Beanstalk.
 
 #### Web Security

@@ -121,7 +121,7 @@ The web tier contains the Atlas/WebAPI Apache and Tomcat auto-scaling instances 
 
 #### OHDSI Component Versions parameters
 This parameters section contains a list of the OHDSI components that will be deployed in your environment and allows you to provide the version number as a parameter.  Default versions are provided that work well together, but you can provide your own version numbers if you desire.  The version number here must map to a **tagged release** or **branch** for that component in it's GitHub repository.  For instance, this is the [list of tagged releases for the OHDSI WebAPI project](https://github.com/OHDSI/WebAPI/tags).
-![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/ohdsi_versions.png "OHDSI component versions")
+![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/ohdsi_versions.png "OHDSI component versions" =250x)
 
 #### VPC Networking parameters
 As a part of this deployment a new [AWS Virtual Private Cloud (VPC)](https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html) is created using private network addressing.  This parameters section allows you to provide your own addresses for this VPC which can be useful if you want to establish a [VPN connection](https://docs.aws.amazon.com/vpc/latest/userguide/vpn-connections.html), [AWS Direct Connect connection](https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html), or [VPC Peering connection](https://docs.aws.amazon.com/vpc/latest/peering/what-is-vpc-peering.html).

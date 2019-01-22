@@ -26,7 +26,7 @@ The features of using this architecture are as follows:
 * It creates automated backups for operational and disaster recovery.
 * It’s built automatically in just a few hours.
 * Environments can be configured from very small to peta-byte scale, geographically redundant implementations by providing different deployment parameters.
-* [The design results in a reasonable monthly cost](https://calculator.s3.amazonaws.com/index.html#r=IAD&key=calc-42CFC1C0-3356-4A35-8697-0A9567A8EA3B) 
+* [The design results in a reasonable monthly cost](https://calculator.s3.amazonaws.com/index.html#r=IAD&key=calc-77D8B2E5-353A-4D7B-B482-023A42F221BB) 
 
 A high-level diagram showing how the different components of OHDSI map to AWS Services is shown below.  
 ![alt-text](https://github.com/JamesSWiggins/ohdsi-cfn/blob/master/images/ohdsi_architecture_block_diagram.png "AWS OHDSI High-Level Diagram")

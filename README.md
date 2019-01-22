@@ -1,7 +1,7 @@
 # Enterprise, Multi-User OHDSI on AWS
 
 ## Quick Start
-This repository allows you to quickly deploy an enterprise class, multi-user, scalable and fault tolerant OHDSI environment on AWS using the latest OHDSI tools.  If you are interested in a personal OHDSI learning environment you may be better suited by the [OHDSI-in-a-box Project](https://github.com/OHDSI/OHDSI-in-a-Box).
+This repository allows you to quickly deploy an enterprise class, multi-user, scalable and fault tolerant OHDSI environment on AWS using the latest OHDSI tools.  If you are interested in a personal OHDSI learning environment you may be better served by the [OHDSI-in-a-box Project](https://github.com/OHDSI/OHDSI-in-a-Box).
 
 <a href="https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?templateURL=https://s3.amazonaws.com/ohdsi-rstudio/00-master-ohdsi.yaml" target="_blank"><img src="https://s3.amazonaws.com/cloudformation-examples/cloudformation-launch-stack.png"/></a> 
 
